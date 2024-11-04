@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Price Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        form {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        label, input, select, button {
+            display: block;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align:center;">House Price Prediction</h1>
+    <form id="housePriceForm">
+        <label for="squareFootage">Square Footage:</label>
+        <input type="number" id="squareFootage" name="squareFootage" required>
+
+        <label for="bedrooms">Number of Bedrooms:</label>
+        <input type="number" id="bedrooms" name="bedrooms" required>
+
+        <label for="bathrooms">Number of Bathrooms:</label>
+        <input type="number" id="bathrooms" name="bathrooms" required>
+
+        <label for="lotSize">Lot Size (sq ft):</label>
+        <input type="number" id="lotSize" name="lotSize" required>
+
+        <label for="garageSize">Garage Size (sq ft):</label>
+        <input type="number" id="garageSize" name="garageSize" required>
+
+        <label for="yearBuilt">Year Built:</label>
+        <input type="number" id="yearBuilt" name="yearBuilt" required>
+
+        <label for="neighborhoodQuality">Neighborhood Quality:</label>
+        <select id="neighborhoodQuality" name="neighborhoodQuality" required>
+            <option value="" disabled selected>Select quality</option>
+            <option value="1">1 - Poor</option>
+            <option value="2">2 - Fair</option>
+            <option value="3">3 - Good</option>
+            <option value="4">4 - Very Good</option>
+            <option value="5">5 - Excellent</option>
+        </select>
+
+        <button type="submit">Predict Price</button>
+    </form>
+
+    <div id="result" style="text-align: center; margin-top: 20px;"></div>
+
+    <script>
+        document.getElementById('housePriceForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Gather form data
+            const formData = new FormData(event.target);
+
+            // Send data to Flask backend
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.predicted_price) {
+                    document.getElementById('result').innerText =
+                        'Predicted House Price: ₹' + data.predicted_price.toFixed(2);
+                } else {
+                    document.getElementById('result').innerText = 'Error: ' + data.error;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('result').innerText = 'An error occurred. Please try again.';
+            });
+        });
+    </script>
+</body>
+</html>
